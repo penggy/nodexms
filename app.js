@@ -7,11 +7,8 @@ var partials = require('express-partials');
 var logger = require('morgan');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-var MySQLStore = require('express-mysql-session')(session);
+var SQLiteStore  = require('connect-sqlite3')(session);
 var app = express();
-// app.engine('.html', require('ejs').__express);
-// app.set('views',__dirname + '/views');
-// app.set('view engine','html');
 app.engine('.html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
@@ -58,15 +55,8 @@ app.use(cookieParser());
 
 app.use(session({
 	secret: 'penggy',
-	store: new MySQLStore({
-		host: 'ucbaby.easydss.com',
-		user: 'root',
-		password: 'root',
-		database: 'ukanbaby',
-		port: 3306,
-		schema: {
-			tableName: 'mp_sessions'
-		}
+	store: new SQLiteStore({
+		db : "xms.db"
 	}),
 	resave: true,
 	saveUninitialized: true
@@ -85,7 +75,7 @@ app.use(function (req, res, next) {
 	}
     if (needLogin && !req.session.user) {
 		req.session.savedRequestUrl = req.originalUrl;
-		res.redirect("/mp/login");
+		res.redirect("/login");
 		return;
     }
     res.locals.user = req.session.user;
