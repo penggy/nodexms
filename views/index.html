@@ -1,0 +1,153 @@
+<div class="page-header">
+    <div class="form-inline form-search pull-right">
+        <div class="form-group">
+            <div class="input-group">
+                <input class="form-control search-query" type="text" name="queryText" placeholder="<%=title %>名称" value="">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary" onclick="javascript:searchSchool();">
+                        查询 <i class="ace-icon fa fa-search icon-on-right"></i>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+<table id="user-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/mp/school/schools" singleSelect="true"
+       toolbar="#user-tb">
+    <thead>
+    <tr>
+        <th field="name" width="150" align="center" sortable="true"><%=title %>名称</th>
+        <th field="description" width="150" align="center">描述</th>
+        <th field="epid" width="100" align="center">企业ID</th>
+        <th field="free_day" width="100" align="center">免费观看天数</th>
+        <th field="index" width="250" align="center" formatter="formatOpt">操作</th>
+    </tr>
+    </thead>
+</table>
+<div id="user-tb">
+    <button type="button" class="easyui-linkbutton" iconCls="fa fa-plus" plain="true" data-toggle="modal" data-target="#user-dlg">新增<%=title %></button>
+</div>
+
+<div class="modal fade" id="user-dlg">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">编辑<%=title %></h4>
+            </div>
+            <form id="user-form" class="form-horizontal" data-toggle="validator">
+                <div class="modal-body">
+                    <input type="hidden" name="index" value="">
+                    <div class="form-group">
+                        <label for="input-username" class="col-sm-3 control-label">
+                            <span class="text-red">*</span>
+                            <%=title %>名称:
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="input-username" type="text" name="name" class="form-control" required>
+                            <span class="help-block with-errors"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-roles" class="col-sm-3 control-label">
+                            <span class="text-red">*</span>
+                            描述:
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="input-roles" type="text" name="description" class="form-control" required>
+                            <span class="help-block with-errors"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">确定</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/javascript">
+    $(function() {
+        $(document).on("shown.bs.modal", "#user-dlg", function() {
+            var id = $(this).find("input[name=index]").val();
+            if (id) {
+                $(this).find(".modal-title").text("编辑<%=title %>");
+            } else {
+                $(this).find(".modal-title").text("新增<%=title %>");
+            }
+        });
+        $('#user-form').validator().on('submit', function(e) {
+            if (!e.isDefaultPrevented()) {
+                e.preventDefault();
+                $.post('/mp/school/save', $("#user-form").serialize(), function(data) {
+                    $.gritter.add({
+                        text : '提交成功!',
+                        class_name : 'gritter-info'
+                    });
+                    $("#user-dlg").modal("hide");
+                    $("#user-table").datagrid("reload");
+                });
+            }
+        });
+    });
+
+    function formatOpt(val, row, idx) {
+        var btns = "<div class='btn-group'>";
+        btns += "<a class='btn btn-xs btn-primary' href='javascript:editUser();'><i class='ace-icon fa fa-edit'></i> 编辑</a>";
+        btns += "<a class='btn btn-xs btn-info' href='javascript:editCookbook();'><i class='ace-icon fa fa-remove'></i> 食谱</a>";
+        btns += "<a class='btn btn-xs btn-danger' href='javascript:removeUser();'><i class='ace-icon fa fa-remove'></i> 删除</a>";
+        btns += "</div>";
+        return btns;
+    }
+
+    function editUser() {
+        var row = $("#user-table").datagrid("getSelected");
+        $("#user-form").form("load", row);
+        $("#user-dlg").modal("show");
+    }
+
+    function removeUser() {
+        var row = $("#user-table").datagrid("getSelected");
+        bootbox.confirm({
+            title : "提示",
+            message : "确定删除<%=title %> <span class='label label-danger'>{0}</span> ?".format(row.name),
+            buttons : {
+                confirm : {
+                    label : "确定",
+                    className : "btn-primary btn-sm",
+                },
+                cancel : {
+                    label : "取消",
+                    className : "btn-sm",
+                }
+            },
+            callback : function(result) {
+                if (result) {
+                    $.post('/mp/school/remove', "index=" + row.index, function(data) {
+                        $("#user-table").datagrid("reload");
+                    });
+                }
+            }
+        });
+    }
+
+    function editCookbook(){
+        var row = $("#user-table").datagrid("getSelected");
+        top.location.href = "/mp/cookbook/" + row.index;
+    }
+
+    function searchSchool() {
+        $("#user-table").datagrid("load", {
+            queryText : $("input[name=queryText]").val()
+        });
+    }
+</script>
