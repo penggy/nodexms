@@ -1,8 +1,7 @@
 /**
  * Created by wupeng on 16/10/5.
  */
-var page = require('./page');
-var db = require('./db');
+var db = new Database();
 var crypto = require('crypto');
 
 exports.users = function (req, res) {
@@ -20,6 +19,21 @@ exports.user = function (req, res) {
     res.render('user', {
         title: '用户管理'
     })
+}
+exports.resetpwd = function (req, res) {
+    var username = req.body.name;
+    var index = parseInt(req.body.index);
+    var md5sum = crypto.createHash('md5');
+    md5sum.update("1234");
+    var _password = md5sum.digest('hex');
+    var sql = "update user set password = ? where `index` = ?";
+    db.query(sql, [_password, index], function (err, result) {
+        if (err) {
+            res.status(500).send(err.message);
+            return;
+        }
+        res.end();
+    });
 }
 
 exports.resetpwd = function (req, res) {

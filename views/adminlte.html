@@ -181,7 +181,7 @@
         }
         $(document).ajaxError(function (evt, xhr, opts, ex) {
             if (xhr.status == 401) {
-                location.href = '/mp/login';
+                top.location.href = '/login';
                 return false;
             }
             if (xhr.status == 404) {
@@ -199,6 +199,7 @@
             }
         });
 
+	    $(".modal.fade").attr("data-backdrop", "static");
         $(document).on("shown.bs.modal", ".modal", function () {
             //$(this).find("input:visible:first").focus();
         }).on("hidden.bs.modal", ".modal", function (e) {
@@ -217,12 +218,19 @@
             $(".btn-primary:disabled[data-ajaxing=true]").prop("disabled", false).removeAttr("data-ajaxing");
         });
 
+	    $("form[data-toggle=validator]").attr("data-disable", "false").attr("autocomplete","off");
+	    $("input[data-toggle=integer]").inputNumber();
         $('form[data-toggle=validator]').validator().on('submit', function (e) {
             var $form = $(this);
             if (e.isDefaultPrevented()) {
                 $form.find(".form-group.has-error:first").find("input:visible").focus();
             }
         });
+        $(document).on("keydown","form[data-toggle=validator]",function(e){
+            if(e.keyCode == 13){
+                return false;
+            }
+        })
 
         easyloader.theme = 'bootstrap';
         easyloader.locale = 'zh_CN';

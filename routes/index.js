@@ -8,11 +8,7 @@ exports.error = function (req, res) {
 }
 
 exports.user = require('./user');
-exports.log = require('./log');
 exports.login = require('./login');
-exports.school = require('./school');
-exports.cookbook = require('./cookbook');
-exports.food = require('./food');
 
 
 

@@ -1,13 +1,49 @@
 ﻿var env = process.env.NODE_ENV || 'development';
-
+global.Database = require('sqlite3').verbose().Database("xms.db");
+global.page = function(req,res,sql,params) {
+    var page = parseInt(req.body.page);
+    var limit = parseInt(req.body.rows);
+    if(isNaN(page) || isNaN(limit)){
+        res.status(500).send("分页数据缺失");
+        return;
+    }
+    var start = limit * (page - 1);
+    var _sql = sql.replace(/\s*(o|O)(r|R)(d|D)(e|E)(r|R)\s+(b|B)(y|Y).*$/,"");
+    cntSql = "select count(*) from (" + _sql + ") as count";
+    var ret = {};
+    var db = new Database;
+    try{
+        db.serialize(function(){
+            db.get(cntSql,params,function(err,row){
+                if(err) throw err;
+                ret.total = row["count"];
+            });
+            if(req.body.sort){
+                _sql += " order by " + req.body.sort + " " + req.body.order;
+            }
+            _sql += " limit ?,?";
+            params.push(start,limit);
+            db.all(_sql,params,function(err,rows){
+                if(err) throw err;
+                ret.rows = rows;
+            })
+            res.json(ret);
+        })
+    }catch(e){
+        res.status(500).send(err.message);
+    }finally{
+        db.close();
+    }
+}
 var express = require('express');
 var bodyParser = require('body-parser')
-var routes = require('./routes');
+var routes = require(__dirname + '/routes');
 var partials = require('express-partials');
 var logger = require('morgan');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var SQLiteStore  = require('connect-sqlite3')(session);
+
 var app = express();
 app.engine('.html', require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -55,9 +91,7 @@ app.use(cookieParser());
 
 app.use(session({
 	secret: 'penggy',
-	store: new SQLiteStore({
-		db : "xms.db"
-	}),
+	store: new SQLiteStore,
 	resave: true,
 	saveUninitialized: true
 }));
@@ -96,9 +130,6 @@ app.post('/user/users', routes.user.users);
 app.post('/user/resetpwd', routes.user.resetpwd);
 app.post('/user/save', routes.user.save);
 app.post('/user/remove', routes.user.remove);
-
-app.get('/log', routes.log.log);
-app.post('/log/logs', routes.log.logs);
 
 app.use(function (err, req, res, next) {
 	var fs = require('fs');
