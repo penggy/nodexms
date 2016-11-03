@@ -21,29 +21,16 @@ exports.doLogin = function (req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
 	var rememberMe = req.body.rememberMe;
-	var errCnt = errorCache.get(username) || 0;
-	if (errCnt >= 10) {
-		res.render('login', {
-			errorMsg: '请稍后再试',
-			username: username,
-			rememberMe: rememberMe,
-			layout: false
-		});
-		return;
-	}
-	var db = new Database;
-	var sql = "select * from t_user where name = ? and password = ?";
-	try {
-		db.serialize(function () {
-			db.get(sql, [username, password], function (err, row) {
-				if (err) throw err;
-				if (!row) {
-					errCnt++;
-					errorCache.set(username, errCnt, 30);
-					throw new Error(util.format('用户名或密码不正确[%d/10]', errCnt));
-				}
-			})
-		})
+	co(function* () {
+		var errCnt = errorCache.get(username) || 0;
+		if (errCnt >= 10) throw new Error("请稍后再试!");
+		var sql = "select * from t_user where name = ? and password = ?";
+		var row = yield db.get(sql, [username, password]);
+		if (!row) {
+			errCnt++;
+			errorCache.set(username, errCnt, 30);
+			throw new Error(util.format("用户名或密码不正确[%d/10]", errCnt));
+		}
 		errorCache.del(username);
 		req.session.user = username;
 		if ('yes' == rememberMe) {
@@ -52,41 +39,39 @@ exports.doLogin = function (req, res) {
 		var url = req.session.savedRequestUrl || "/";
 		delete req.session.savedRequestUrl;
 		res.redirect(url);
-	} catch (e) {
+	}).catch(function (e) {
 		res.render('login', {
 			errorMsg: e.message,
 			username: username,
 			rememberMe: rememberMe,
 			layout: false
 		});
-	} finally {
-		db.close();
-	}
+	});
 }
 exports.doRegist = function (req, res) {
 	var username = req.body.username;
 	var password = req.body.password;
 	var db = new Database;
 	var sql = "select * from t_user where name = ?";
-	try{
-		db.serialize(function(){
-			db.get(sql,[username],function(err,row){
-				if(err) throw err;
-				if(row) throw new Error("用户名已存在");
+	try {
+		db.serialize(function () {
+			db.get(sql, [username], function (err, row) {
+				if (err) throw err;
+				if (row) throw new Error("用户名已存在");
 			})
 			sql = "insert into t_user(id,name,password,regist_time) values(?,?,?,?)";
 			var uuid = require("node-uuid");
-			var id = uuid.v4().replace(/\-/g,"");
+			var id = uuid.v4().replace(/\-/g, "");
 			var moment = require("moment");
 			var time = moment().format('yyyy-MM-dd HH:mm:ss');
-			db.run(sql,[id,username,password,time],function(err){
-				if(err) throw err;
+			db.run(sql, [id, username, password, time], function (err) {
+				if (err) throw err;
 			})
 			res.end();
 		})
-	}catch(e){
+	} catch (e) {
 		res.status(500).send(e.message);
-	}finally{
+	} finally {
 		db.close();
 	}
 }
@@ -100,21 +85,21 @@ exports.modifypwd = function (req, res) {
 	}
 	var db = new Database;
 	var sql = "select * from t_user where name = ? and password = ?";
-	try{
-		db.serialize(function(){
-			db.get(sql,[username,oldPwd],function(err,row){
-				if(err) throw err;
-				if(!row) throw new Error("原密码不正确");
+	try {
+		db.serialize(function () {
+			db.get(sql, [username, oldPwd], function (err, row) {
+				if (err) throw err;
+				if (!row) throw new Error("原密码不正确");
 			})
 			sql = "update t_user set password = ? where name = ?";
-			db.run(sql,[newPwd,username],function(err){
-				if(err) throw err;
+			db.run(sql, [newPwd, username], function (err) {
+				if (err) throw err;
 			})
 			res.end();
 		})
-	}catch(e){
+	} catch (e) {
 		res.status(500).send(e.message);
-	}finally{
+	} finally {
 		db.close();
 	}
 }

@@ -38,7 +38,7 @@
 	                                class="fa fa-key"></i> 修改密码</a>
 	                    </li>
 	                    <li>
-	                        <a id="btn-logout" href="/mp/logout"><i class="fa fa-power-off"></i> 注 销</a>
+	                        <a id="btn-logout" href="/logout"><i class="fa fa-power-off"></i> 注 销</a>
 	                    </li>
 	                </ul>
 	            </div>
@@ -49,31 +49,31 @@
 	        <section class="sidebar">
 	            <ul class="sidebar-menu">
 	            	<li class="treeview">
-	            		<a href="/mp/">
+	            		<a href="/">
 	            			<i class="fa fa-dashboard"></i>
 	            			<span>学校管理</span>
 	            		</a>
 	            	</li>
 		            <li class='treeview'>
-		            	<a href="/mp/user">
+		            	<a href="/user">
 		            		<i class="fa fa-users"></i>
 		            		<span>用户管理</span>
 		            	</a>
 		            </li>
 		            <li class='treeview'>
-		            	<a href="/mp/food">
+		            	<a href="/food">
 		            		<i class="fa fa-cutlery"></i>
 		            		<span>食谱管理</span>
 		            	</a>
 		            </li>
 		            <li class="treeview">
-		            	<a href="/mp/log">
+		            	<a href="/log">
 				       		<i class="fa fa-paw"></i>
 		            		<span>访问记录</span>
 		            	</a>
 		            </li>
 		            <li class="treeview">
-		            	<a href="/mp/error">
+		            	<a href="/error">
 				       		<i class="fa fa-exclamation-circle"></i>
 		            		<span>错误页面</span>
 		            	</a>
@@ -188,7 +188,7 @@
 	                $.gritter.add("密码长度不超过16字符，为英文或数字!");
 	                return false;
 	            }
-	            $.post('/mp/modifypwd', {
+	            $.post('/modifypwd', {
 	                oldPwd: $.md5(_oldPwd),
 	                newPwd: $.md5(_newPwd),
 	                newPwd2: $.md5(_newPwd2)

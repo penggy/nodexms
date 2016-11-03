@@ -1,7 +1,7 @@
 /**
  * Created by wupeng on 16/10/5.
  */
-var db = new Database();
+// var db = new Database();
 var crypto = require('crypto');
 
 exports.users = function (req, res) {

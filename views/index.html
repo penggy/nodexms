@@ -14,7 +14,7 @@
     <div class="clearfix"></div>
 </div>
 
-<table id="user-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/mp/school/schools" singleSelect="true"
+<table id="user-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/school/schools" singleSelect="true"
        toolbar="#user-tb">
     <thead>
     <tr>
@@ -88,7 +88,7 @@
         $('#user-form').validator().on('submit', function(e) {
             if (!e.isDefaultPrevented()) {
                 e.preventDefault();
-                $.post('/mp/school/save', $("#user-form").serialize(), function(data) {
+                $.post('/school/save', $("#user-form").serialize(), function(data) {
                     $.gritter.add({
                         text : '提交成功!',
                         class_name : 'gritter-info'
@@ -132,7 +132,7 @@
             },
             callback : function(result) {
                 if (result) {
-                    $.post('/mp/school/remove', "index=" + row.index, function(data) {
+                    $.post('/school/remove', "index=" + row.index, function(data) {
                         $("#user-table").datagrid("reload");
                     });
                 }
@@ -142,7 +142,7 @@
 
     function editCookbook(){
         var row = $("#user-table").datagrid("getSelected");
-        top.location.href = "/mp/cookbook/" + row.index;
+        top.location.href = "/cookbook/" + row.index;
     }
 
     function searchSchool() {

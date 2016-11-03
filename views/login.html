@@ -3,57 +3,21 @@
 	<head>
 		<title>登录</title>
 		<% include adminlte.html %>
-
-		<style>
-	        .header-space {
-	            margin : 60px 0;
-	        }
-
-	        .login-container{
-	            margin : 0 auto;
-	            width : 340px;
-	        }
-
-	        .panel {
-	            position: fixed;
-	            visibility: hidden;
-	            z-index: auto;
-
-	            -moz-transform: scale(0,1) translate(-150px);
-	            -webkit-transform: scale(0,1) translate(-150px);
-	            -o-transform: scale(0,1) translate(-150px);
-	            -ms-transform: scale(0,1) translate(-150px);
-	            transform: scale(0,1) translate(-150px);
-	        }
-
-	        .panel.visible {
-	            visibility: visible;
-	            position: relative;
-
-	            -moz-transform: scale(1,1) translate(0);
-	            -webkit-transform: scale(1,1) translate(0);
-	            -o-transform: scale(1,1) translate(0);
-	            -ms-transform: scale(1,1) translate(0);
-	            transform: scale(1,1) translate(0);
-
-	            transition: transform .3s ease;
-	            -moz-transition: -moz-transform .3s ease;
-	            -webkit-transition: -webkit-transform .3s ease;
-	            -o-transition: -o-transform .2s ease;
-	        }
-	    </style>
+		<link rel="stylesheet" href="/adminlte-2.3.6/plugins/iCheck/all.css">
+		<script src="/adminlte-2.3.6/plugins/iCheck/icheck.min.js"></script>
+		<link rel="stylesheet" href="/css/login.css">
 	</head>
-	<body class="center">
+	<body class="center light-login">
 		<div class="row header-space">
 		</div>
 		<div class="login-container">
 		    <div id="login-panel" class="panel panel-primary visible">
 		        <div class="panel-heading text-center">
-		            <h3><b>UCBaby</b> - 登录</h3>
+		            <h3><b><%= title.toUpperCase() -%></b> 登录</h3>
 		        </div>
 		        <div class="panel-body">
 		            <br>
-					<form action="/mp/login" method="POST" id="login-form" data-toggle="validator" data-feedback="" data-disable="false">
+					<form action="/login" method="POST" id="login-form" data-toggle="validator" data-feedback="" data-disable="false">
 		                <input name="password" type="hidden"/>
 		                <div class="form-group has-feedback">
 		                    <input id="login-username" type="text" class="form-control" placeholder="用户名" name="username" value="<%= locals.username %>" required>
@@ -87,9 +51,9 @@
 		                    <a href="#" class="" data-target="#forgot-panel">忘记密码</a>
 		                </div>
 		                <div class="col-xs-6 text-right">
-		                    <% if(locals.query.regist) { %>
+		                    <%# if(locals.query.regist) { %>
 		                        <a href="#" class="" data-target="#regist-panel">注 册</a>
-		                    <% delete locals.query.regist} %>
+		                    <%# delete locals.query.regist} %>
 		                </div>
 		            </div>
 		        </div>
@@ -111,7 +75,7 @@
 
 		    <div id="regist-panel" class="panel panel-primary">
 		        <div class="panel-heading text-center">
-		            <h3><b>UCBaby</b> - 注册</h3>
+		            <h3><b><%= title.toUpperCase() -%></b> - 注册</h3>
 		        </div>
 		        <div class="panel-body">
 		            <br>
@@ -119,11 +83,6 @@
 		                <div class="form-group has-feedback">
 		                    <input id="regist-username" type="text" class="form-control" placeholder="用户名" name="username" required>
 		                    <span class="glyphicon glyphicon-user form-control-feedback text-gray"></span>
-							<span class="help-block with-errors"></span>
-		                </div>
-						<div class="form-group has-feedback">
-		                    <input id="regist-phonenumber" type="text" class="form-control" placeholder="手机号" name="phonenumber" pattern="^1\d{10}$" required>
-		                    <span class="glyphicon glyphicon-phone form-control-feedback text-gray"></span>
 							<span class="help-block with-errors"></span>
 		                </div>
 		                <div class="form-group has-feedback">
@@ -226,7 +185,7 @@
 						var phonenumber = $("#regist-phonenumber").val();
 						var password = $("#regist-pwd").val();
 						$.ajax({
-							url : '/mp/regist',
+							url : '/regist',
 							method : 'POST',
 							type : 'json',
 							data : {

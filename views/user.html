@@ -14,7 +14,7 @@
     <div class="clearfix"></div>
 </div>
 
-<table id="user-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/mp/user/users" singleSelect="true"
+<table id="user-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/user/users" singleSelect="true"
     toolbar="#user-tb">
     <thead>
         <tr>
@@ -87,7 +87,7 @@
         $('#user-form').validator().on('submit', function(e) {
             if (!e.isDefaultPrevented()) {
                 e.preventDefault();
-                $.post('/mp/user/save', $("#user-form").serialize(), function(data) {
+                $.post('/user/save', $("#user-form").serialize(), function(data) {
                     $.gritter.add({
                         text : '提交成功!',
                         class_name : 'gritter-info'
@@ -131,7 +131,7 @@
             },
             callback : function(result) {
                 if (result) {
-                    $.post('/mp/user/resetpwd', {
+                    $.post('/user/resetpwd', {
                         index : row.index,
                         name : row.name
                     }, function(data) {
@@ -162,7 +162,7 @@
             },
             callback : function(result) {
                 if (result) {
-                    $.post('/mp/user/remove', "index=" + row.index, function(data) {
+                    $.post('/user/remove', "index=" + row.index, function(data) {
                         $("#user-table").datagrid("reload");
                     });
                 }
