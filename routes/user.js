@@ -1,7 +1,4 @@
-/**
- * Created by wupeng on 16/10/5.
- */
-var crypto = require('crypto');
+var co = require('co');
 
 exports.users = function (req, res) {
     var sql = "select * from t_user where 1=1";
@@ -15,89 +12,51 @@ exports.users = function (req, res) {
 }
 
 exports.user = function (req, res) {
-    res.render('user', {
-        title: '用户管理'
+    res.render('user');
+}
+exports.resetpwd = function (req, res) {
+    co(function* () {
+        var sql = "update t_user set password = ? where id = ?";
+        yield db.run(sql, [md5("1234"), req.body.id]);
+        res.end();
+    }).catch(function (e) {
+        res.status(500).send(e.message);
     })
-}
-exports.resetpwd = function (req, res) {
-    var username = req.body.name;
-    var index = parseInt(req.body.index);
-    var md5sum = crypto.createHash('md5');
-    md5sum.update("1234");
-    var _password = md5sum.digest('hex');
-    var sql = "update user set password = ? where `index` = ?";
-    db.query(sql, [_password, index], function (err, result) {
-        if (err) {
-            res.status(500).send(err.message);
-            return;
-        }
-        res.end();
-    });
-}
-
-exports.resetpwd = function (req, res) {
-    var username = req.body.name;
-    var index = parseInt(req.body.index);
-    var md5sum = crypto.createHash('md5');
-    md5sum.update("1234");
-    var _password = md5sum.digest('hex');
-    var sql = "update user set password = ? where `index` = ?";
-    db.query(sql, [_password, index], function (err, result) {
-        if (err) {
-            res.status(500).send(err.message);
-            return;
-        }
-        res.end();
-    });
 }
 
 exports.save = function (req, res) {
-    var index = parseInt(req.body.index);
-    var name = req.body.name;
-    var phonenumber = req.body.phonenumber;
-    var sql = "select * from user where (name = ? or phonenumber = ?)";
-    var params = [name, phonenumber];
-    if (index > 0) {
-        sql += " and `index` != ?";
-        params.push(index);
-    }
-    db.query(sql, params, function (err, rows, fields) {
-        if (err) {
-            res.status(500).send(err.message);
-            return;
+    co(function* () {
+        var id = req.body.id;
+        var name = req.body.name;
+        var roles = req.body.roles;
+        var sql = "select * from t_user where name = ?";
+        var params = [name];
+        if (id) {
+            sql += " and id != ?";
+            params.push(id);
         }
-        if (rows.length > 0) {
-            res.status(500).send("用户名或手机号已存在");
-            return;
-        }
-        if (index > 0) {
-            sql = "update user set name = ?, phonenumber = ? where `index` = ?";
-            params = [name, phonenumber, index];
+        var row = yield db.get(sql, params);
+        if (row) throw new Error("用户名已存在");
+        if (id) {
+            sql = "update t_user set name = ?, roles = ? where id = ?";
+            params = [name, roles, id];
         } else {
-            var md5sum = crypto.createHash('md5');
-            md5sum.update('1234');
-            var _password = md5sum.digest('hex');
-            params = [name, phonenumber, _password];
-            sql = "insert into user(name,phonenumber,password) values(?,?,?)"
+            params = [uuid(), name, roles, md5("1234"), formatDateTime()];
+            sql = "insert into t_user(id,name,roles,password,regist_time) values(?,?,?,?,?)"
         }
-        db.query(sql, params, function (err, result) {
-            if (err) {
-                res.status(500).send(err.message);
-                return;
-            }
-            res.end();
-        });
+        yield db.run(sql, params);
+        res.end();
+    }).catch(function (e) {
+        res.status(500).send(e.message);
     })
 }
 
 exports.remove = function (req, res) {
-    var index = parseInt(req.body.index);
-    var sql = "delete from user where `index` = ?";
-    db.query(sql, [index], function (err, result) {
-        if (err) {
-            res.status(500).send(err.message);
-            return;
-        }
+    co(function* () {
+        var sql = "delete from t_user where id = ?";
+        yield db.run(sql, [req.body.id]);
         res.end();
-    });
+    }).catch(function (e) {
+        res.status(500).send(e.message);
+    })
 }

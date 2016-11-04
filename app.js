@@ -1,6 +1,10 @@
-﻿var env = process.env.NODE_ENV || 'development';
+﻿global.uuid = function () { return require('node-uuid').v4().replace(/\-/g, ''); }
+global.md5 = function (str) { return require('crypto').createHash('md5').update(str).digest('hex'); }
+global.formatDateTime = function (d) { return require('moment')(d).format('YYYY-MM-DD HH:mm:ss'); }
+global.formatDate = function (d) { return require('moment')(d).format('YYYY-MM-DD'); }
 global.db = require("./db");
 db.init();
+var env = process.env.NODE_ENV || 'development';
 var express = require('express');
 var bodyParser = require('body-parser')
 var routes = require(__dirname + '/routes');
@@ -44,7 +48,8 @@ app.locals.addStyles = function (all) {
 app.locals.getStyles = function (req, res) {
 	return styles;
 };
-app.locals.title = "xms";
+app.locals.title = "NodeXms";
+app.locals.miniTitle = "XMS";
 
 app.use(partials());
 app.use(logger('dev'));
@@ -96,6 +101,8 @@ app.post('/user/users', routes.user.users);
 app.post('/user/resetpwd', routes.user.resetpwd);
 app.post('/user/save', routes.user.save);
 app.post('/user/remove', routes.user.remove);
+
+app.use('/menu',routes.menu);
 
 app.use(function (err, req, res, next) {
 	var fs = require('fs');

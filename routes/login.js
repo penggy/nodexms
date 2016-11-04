@@ -49,31 +49,18 @@ exports.doLogin = function (req, res) {
 	});
 }
 exports.doRegist = function (req, res) {
-	var username = req.body.username;
-	var password = req.body.password;
-	var db = new Database;
-	var sql = "select * from t_user where name = ?";
-	try {
-		db.serialize(function () {
-			db.get(sql, [username], function (err, row) {
-				if (err) throw err;
-				if (row) throw new Error("用户名已存在");
-			})
-			sql = "insert into t_user(id,name,password,regist_time) values(?,?,?,?)";
-			var uuid = require("node-uuid");
-			var id = uuid.v4().replace(/\-/g, "");
-			var moment = require("moment");
-			var time = moment().format('yyyy-MM-dd HH:mm:ss');
-			db.run(sql, [id, username, password, time], function (err) {
-				if (err) throw err;
-			})
-			res.end();
-		})
-	} catch (e) {
-		res.status(500).send(e.message);
-	} finally {
-		db.close();
-	}
+	co(function* () {
+		var username = req.body.username;
+		var password = req.body.password;
+		var sql = "select * from t_user where name = ?";
+		var row = yield db.get(sql, [username]);
+		if (row) throw new Error("用户名已存在");
+		sql = "insert into t_user(id,name,password,regist_time) values(?,?,?,?)";
+		yield db.run(sql, [uuid(), username, password, formatDateTime()]);
+		res.end();
+	}).catch(function (err) {
+		res.status(500).send(err.message);
+	})
 }
 exports.modifypwd = function (req, res) {
 	var oldPwd = req.body.oldPwd;
@@ -83,25 +70,16 @@ exports.modifypwd = function (req, res) {
 		res.redirect("/login");
 		return;
 	}
-	var db = new Database;
-	var sql = "select * from t_user where name = ? and password = ?";
-	try {
-		db.serialize(function () {
-			db.get(sql, [username, oldPwd], function (err, row) {
-				if (err) throw err;
-				if (!row) throw new Error("原密码不正确");
-			})
-			sql = "update t_user set password = ? where name = ?";
-			db.run(sql, [newPwd, username], function (err) {
-				if (err) throw err;
-			})
-			res.end();
-		})
-	} catch (e) {
-		res.status(500).send(e.message);
-	} finally {
-		db.close();
-	}
+	co(function* () {
+		var sql = "select * from t_user where name = ? and password = ?";
+		var row = yield db.get(sql, [username, oldPwd]);
+		if (!row) throw new Error("原密码不正确");
+		sql = "update t_user set password = ? where name = ?";
+		yield db.run(sql, [newPwd, username]);
+		res.end();
+	}).catch(function (err) {
+		res.status(500).send(err.message);
+	})
 }
 
 
