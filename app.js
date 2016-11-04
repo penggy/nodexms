@@ -1,5 +1,6 @@
 ﻿var env = process.env.NODE_ENV || 'development';
 global.db = require("./db");
+db.init();
 var express = require('express');
 var bodyParser = require('body-parser')
 var routes = require(__dirname + '/routes');

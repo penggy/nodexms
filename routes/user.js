@@ -1,18 +1,17 @@
 /**
  * Created by wupeng on 16/10/5.
  */
-// var db = new Database();
 var crypto = require('crypto');
 
 exports.users = function (req, res) {
-    var sql = "select * from user where 1=1";
+    var sql = "select * from t_user where 1=1";
     var params = [];
     if (req.body.queryText) {
-        sql += " and (phonenumber like ? or name like ?)"
-        params.push("%" + req.body.queryText + "%", "%" + req.body.queryText + "%");
+        sql += " and name like ?"
+        params.push("%" + req.body.queryText + "%");
     }
     sql += " order by name desc";
-    page(req, res, sql, params);
+    db.page(req, res, sql, params);
 }
 
 exports.user = function (req, res) {

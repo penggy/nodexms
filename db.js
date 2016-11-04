@@ -16,8 +16,8 @@ exports.get = function(sql,params){
                     onReject(err);
                     return;
                 }
-                onFulfill(row);
                 db.close();
+                onFulfill(row);
             })
         }
     });
@@ -33,8 +33,8 @@ exports.all = function(sql,params){
                     onReject(err);
                     return;
                 }
-                onFulfill(rows);
                 db.close();
+                onFulfill(rows);
             })
         }
     });
@@ -50,25 +50,25 @@ exports.run = function(sql,params){
                     onReject(err);
                     return;
                 }
-                onFulfill(this);
                 db.close();
+                onFulfill(this);
             })
         }
     });
 }
 
-exports.exec = function(sql,params){
+exports.exec = function(sql){
     return Promise.resolve({
         then : function(onFulfill,onReject){
             var db = new Database();
-            db.exec(sql,params,function(err){
+            db.exec(sql,function(err){
                 if(err){
                     db.close();
                     onReject(err);
                     return;
                 }
-                onFulfill(this);
                 db.close();
+                onFulfill(this);
             })
         }
     });
@@ -81,7 +81,7 @@ exports.page = function (req, res, sql, params) {
         if (isNaN(page) || isNaN(limit)) throw new Error("分页数据缺失");
         var start = limit * (page - 1);
         var _sql = sql.replace(/\s*(o|O)(r|R)(d|D)(e|E)(r|R)\s+(b|B)(y|Y).*$/, "");
-        cntSql = "select count(*) from (" + _sql + ") as count";
+        cntSql = "select count(*) as count from (" + _sql + ")";
         var ret = {};
         var row = yield exports.get(cntSql,params);
         ret.total = row["count"];
@@ -95,5 +95,15 @@ exports.page = function (req, res, sql, params) {
         res.json(ret);
     }).catch(function(err){
         res.status(500).send(err.message);
+    })
+}
+
+exports.init = function(){
+    var fs = require("fs");
+    var sql = fs.readFileSync(__dirname + "/db.sql","utf-8");
+    co(function*(){
+        yield exports.exec(sql);
+    }).catch(function(err){
+        console.log(err);
     })
 }
