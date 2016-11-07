@@ -74,8 +74,8 @@ exports.modifypwd = function (req, res) {
 		sql = "update t_user set password = ? where name = ?";
 		yield db.run(sql, [newPwd, username]);
 		res.end();
-	}).catch(function (err) {
-		res.status(500).send(err.message);
+	}).catch(function (e) {
+		res.status(500).send(e.message);
 	})
 }
 
