@@ -1,6 +1,3 @@
-var util = require('util');
-var co = require('co');
-var crypto = require('crypto');
 var NodeCache = require("node-cache");
 var errorCache = new NodeCache();
 
