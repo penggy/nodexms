@@ -92,12 +92,11 @@ app.use(function (req, res, next) {
 
 app.get('/', routes.index);
 app.use('/error', routes.error);
-
-app.get('/login', routes.login.login);
-app.get('/logout', routes.login.logout);
-app.post('/login', routes.login.doLogin);
-app.post('/regist', routes.login.doRegist);
-app.post('/modifypwd', routes.login.modifypwd);
+app.get('/login', routes.login);
+app.get('/logout', routes.logout);
+app.post('/login', routes.doLogin);
+app.post('/regist', routes.doRegist);
+app.post('/modifypwd', routes.modifypwd);
 
 app.use('/user', routes.user);
 app.use('/menu',routes.menu);
