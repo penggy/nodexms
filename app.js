@@ -2,10 +2,13 @@
 global.md5 = function (str) { return require('crypto').createHash('md5').update(str).digest('hex'); }
 global.formatDateTime = function (d) { return require('moment')(d).format('YYYY-MM-DD HH:mm:ss'); }
 global.formatDate = function (d) { return require('moment')(d).format('YYYY-MM-DD'); }
+global.express = require('express');
+global.co = require('co');
+global.Promise = require('promise');
+global.util = require('util');
 global.db = require("./db");
 db.init();
 var env = process.env.NODE_ENV || 'development';
-var express = require('express');
 var bodyParser = require('body-parser')
 var routes = require(__dirname + '/routes');
 var partials = require('express-partials');

@@ -201,16 +201,16 @@
 	                });
 	                return;
 	            }
-	            if (menu.url) {
-	                var $li = $("<li></li>");
-	                var $a = $("<a href='{0}'></a>".format(menu.url));
+	            if (menu.path) {
+	                var $li = $("<li class='treeview'></li>");
+	                var $a = $("<a href='{0}'></a>".format(menu.path));
 	                $a.append("<i class='{0}'></i>".format(menu.icon || (lv == 1 ? "fa fa-file-o" : "fa fa-caret-right")));
 	                $a.append(" <span>{0}</span>".format(menu.title));
 	                $li.append($a);
 	                $ul.append($li);
 	                return;
 	            }
-	            if (menu.title && !menu.url) {
+	            if (menu.title && !menu.path) {
 	                var $li = $("<li class='treeview'></li>");
 	                var $a = $("<a href='#'></a>");
 	                $a.append("<i class='{0}'></i>".format(menu.icon || "fa fa-folder-open-o"));
@@ -231,28 +231,22 @@
 	        }//renderMenu
 
 	        var $menu = $("ul.sidebar-menu");
-	        // $.post('/menu/tree', function (data) {
-	        //     renderMenu($menu, data, 0);
-	        //     //阻止菜单的展开关闭动作
-	        //     $menu.find("> li > a").click(function () {
-	        //         return false;
-	        //     });
-	        //     //$menu.append("<li class='header text-gray text-center'><i class='fa fa-sitemap'></i>  设备树</li>")
+	        $.post('/menu/tree', function (data) {
+				console.log("data = " + data);
+	            renderMenu($menu, data, 0);
+	            //阻止菜单的展开关闭动作
+	            // $menu.find("> li > a").click(function () {
+	            //     return false;
+	            // });
+	            //$menu.append("<li class='header text-gray text-center'><i class='fa fa-sitemap'></i>  设备树</li>")
 
-	        //     //渲染菜单状态
-	        //     $menu.find("li").removeClass('active');
-	        //     $link = $menu.find("li a[href='{0}']".format(location.pathname)).first();
-	        //     if ($link.size() == 1) {
-	        //         $link.parents("ul.sidebar-menu li").addClass("active");
-	        //     }
-	        // }, "json");
-
-	       	//渲染菜单状态
-            $menu.find("li").removeClass('active');
-            $link = $menu.find("li a[href='{0}']".format(location.pathname)).first();
-            if ($link.size() == 1) {
-                $link.parents("ul.sidebar-menu li").addClass("active");
-            }
+	            //渲染菜单状态
+	            $menu.find("li").removeClass('active');
+	            $link = $menu.find("li a[href='{0}']".format(location.pathname)).first();
+	            if ($link.size() == 1) {
+	                $link.parents("ul.sidebar-menu li").addClass("active");
+	            }
+	        }, "json");
 	    });
 	</script>
 	</body>
