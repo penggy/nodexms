@@ -96,12 +96,7 @@ app.post('/login', routes.login.doLogin);
 app.post('/regist', routes.login.doRegist);
 app.post('/modifypwd', routes.login.modifypwd);
 
-app.get('/user', routes.user.user);
-app.post('/user/users', routes.user.users);
-app.post('/user/resetpwd', routes.user.resetpwd);
-app.post('/user/save', routes.user.save);
-app.post('/user/remove', routes.user.remove);
-
+app.use('/user', routes.user);
 app.use('/menu',routes.menu);
 
 app.use(function (err, req, res, next) {

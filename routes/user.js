@@ -1,6 +1,12 @@
 var co = require('co');
+var express = require('express');
+var user = express.Router();
 
-exports.users = function (req, res) {
+user.get('/',function (req, res) {
+    res.render('user');
+})
+
+user.post('/users',function (req, res) {
     var sql = "select * from t_user where 1=1";
     var params = [];
     if (req.body.queryText) {
@@ -9,12 +15,9 @@ exports.users = function (req, res) {
     }
     sql += " order by name desc";
     db.page(req, res, sql, params);
-}
+})
 
-exports.user = function (req, res) {
-    res.render('user');
-}
-exports.resetpwd = function (req, res) {
+user.post('/resetpwd',function (req, res) {
     co(function* () {
         var sql = "update t_user set password = ? where id = ?";
         yield db.run(sql, [md5("1234"), req.body.id]);
@@ -22,9 +25,9 @@ exports.resetpwd = function (req, res) {
     }).catch(function (e) {
         res.status(500).send(e.message);
     })
-}
+})
 
-exports.save = function (req, res) {
+user.post('/save',function (req, res) {
     co(function* () {
         var id = req.body.id;
         var name = req.body.name;
@@ -49,9 +52,9 @@ exports.save = function (req, res) {
     }).catch(function (e) {
         res.status(500).send(e.message);
     })
-}
+})
 
-exports.remove = function (req, res) {
+user.post('/remove',function (req, res) {
     co(function* () {
         var sql = "delete from t_user where id = ?";
         yield db.run(sql, [req.body.id]);
@@ -59,4 +62,6 @@ exports.remove = function (req, res) {
     }).catch(function (e) {
         res.status(500).send(e.message);
     })
-}
+})
+
+module.exports = user;

@@ -14,20 +14,24 @@
     <div class="clearfix"></div>
 </div>
 
-<table id="menu-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" url="/menu/menus" singleSelect="true"
-    toolbar="#menu-tb">
+<table id="menu-table" class="easyui-datagrid" width="100%" rownumbers="true" pagination="true" 
+    url="/menu/menus?pid=<%=pid-%>" singleSelect="true" toolbar="#menu-tb" 
+    title="<%= pmenu?pmenu['title']:'系统菜单' -%>">
     <thead>
         <tr>
-            <th field="title" width="100" align="center" sortable="true">标题</th>
-            <th field="path" width="200" align="center">路径</th>
-            <th field="icon" width="120" align="center">图标</th>
-            <th field="roles" width="140" align="center">角色</th>
+            <th field="title" width="120" align="center" formatter="formatTitle">标题</th>
+            <th field="path" width="200" align="left">路径</th>
+            <th field="roles" width="120" align="center">角色</th>
+            <th field="sort_number" width="80" align="center">排序</th>
             <th field="id" width="250" align="center" formatter="formatOpt">操作</th>
         </tr>
     </thead>
 </table>
 <div id="menu-tb">
     <button type="button" class="easyui-linkbutton" iconCls="fa fa-plus" plain="true" data-toggle="modal" data-target="#menu-dlg">新增菜单</button>
+    <% if(pmenu){%>
+    <a href="/menu/<%=pmenu['pid']-%>" class="easyui-linkbutton" iconCls="fa fa-arrow-up" plain="true" data-toggle="modal">上级菜单</a>
+    <%}%>
 </div>
 
 <div class="modal fade" id="menu-dlg">
@@ -42,6 +46,7 @@
             <form id="menu-form" class="form-horizontal" data-toggle="validator">
                 <div class="modal-body">
                     <input type="hidden" name="id" value="">
+                    <input type="hidden" name="pid" value="<%=pid-%>">
                     <div class="form-group">
                         <label for="input-title" class="col-sm-3 control-label">
                             <span class="text-red">*</span>
@@ -79,6 +84,16 @@
                         </label>
                         <div class="col-sm-8">
                             <input id="input-roles" type="text" name="roles" class="form-control">
+                            <span class="help-block with-errors"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-sort-number" class="col-sm-3 control-label">
+                            <!--<span class="text-red">*</span>-->
+                            排序:
+                        </label>
+                        <div class="col-sm-8">
+                            <input id="input-sort-number" type="text" name="sort_number" class="form-control" data-toggle="integer">
                             <span class="help-block with-errors"></span>
                         </div>
                     </div>
@@ -123,6 +138,10 @@
         btns += "<a class='btn btn-xs btn-danger' href='javascript:removeMenu();'><i class='ace-icon fa fa-remove'></i> 删除</a>";
         btns += "</div>";
         return btns;
+    }
+
+    function formatTitle(val,row,idx){
+        return "<a href='/menu/{0}'><i class='{1}'></i> {2}</a>".format(row['id'],row['icon'],val);
     }
 
     function editMenu() {

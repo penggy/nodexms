@@ -80,17 +80,19 @@ exports.page = function (req, res, sql, params) {
         var limit = parseInt(req.body.rows);
         if (isNaN(page) || isNaN(limit)) throw new Error("分页数据缺失");
         var start = limit * (page - 1);
-        var _sql = sql.replace(/\s*(o|O)(r|R)(d|D)(e|E)(r|R)\s+(b|B)(y|Y).*$/, "");
-        cntSql = "select count(*) as count from (" + _sql + ")";
+        var cntSql = sql.replace(/\s*(o|O)(r|R)(d|D)(e|E)(r|R)\s+(b|B)(y|Y).*$/, "");
+        cntSql = "select count(*) as count from (" + cntSql + ")";
         var ret = {};
         var row = yield exports.get(cntSql,params);
         ret.total = row["count"];
+        var pageSql = sql;
         if (req.body.sort) {
-            _sql += " order by " + req.body.sort + " " + req.body.order;
+            pageSql = sql.replace(/\s*(o|O)(r|R)(d|D)(e|E)(r|R)\s+(b|B)(y|Y).*$/, "");
+            pageSql += " order by " + req.body.sort + " " + req.body.order;
         }
-        _sql += " limit ?,?";
+        pageSql += " limit ?,?";
         params.push(start, limit);
-        var rows = yield exports.all(_sql,params);
+        var rows = yield exports.all(pageSql,params);
         ret.rows = rows;
         res.json(ret);
     }).catch(function(err){
