@@ -1,5 +1,6 @@
 var NodeCache = require("node-cache");
 var errorCache = new NodeCache();
+var menuCache = new NodeCache();
 
 exports.index = function (req, res) {
 	res.render('user')
