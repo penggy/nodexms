@@ -88,6 +88,7 @@ exports.modifypwd = function (req, res) {
 
 exports.user = require('./user');
 exports.menu = require('./menu');
+exports.disk = require('./disk');
 
 
 

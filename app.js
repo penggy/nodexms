@@ -5,8 +5,10 @@ global.formatDate = function (d) { return require('moment')(d).format('YYYY-MM-D
 global.express = require('express');
 global.co = require('co');
 global.Promise = require('promise');
+global.iconv = require('iconv-lite');
 global.util = require('util');
 global.db = require("./db");
+global.mysql = require("./mysql");
 db.init();
 var env = process.env.NODE_ENV || 'development';
 var bodyParser = require('body-parser')
@@ -99,7 +101,8 @@ app.post('/regist', routes.doRegist);
 app.post('/modifypwd', routes.modifypwd);
 
 app.use('/user', routes.user);
-app.use('/menu',routes.menu);
+app.use('/menu', routes.menu);
+app.use('/disk', routes.disk);
 
 app.use(function (err, req, res, next) {
 	var fs = require('fs');

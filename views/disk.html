@@ -1,0 +1,42 @@
+<div class="page-header">
+</div>
+
+<div class="container-fluid jumbotron" style="background-color:#ccc;">
+    <% for(var i in drivers) { 
+        var driver = drivers[i];
+        if(drivers[i].total == 0) 
+            continue;
+        var percent = driver.usedPercent;
+    %>
+    <div class="row">
+        <div class="col-xs-1 no-margin no-padding">
+            <div class="row">&nbsp;</div>
+            <h3 class="row text-right text-primary no-margin"><i class="fa fa-hdd-o"></i></h3>
+            <div class="row">&nbsp;</div>
+        </div>
+        <div class="col-xs-4">
+            <strong><%= driver.name%>:</strong>
+            <div class="progress" style="margin-bottom:0;">
+            <%if(percent < 90){%>
+                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="<%=percent%>" aria-valuemin="0" aria-valuemax="100" style="width: <%=percent%>%">
+                    <%= percent %>%
+                </div>
+            <%}else{%>
+                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<%=percent%>" aria-valuemin="0" aria-valuemax="100" style="width: <%=percent%>%">
+                    <%= percent %>%
+                </div>
+            <%}%>
+            </div>
+            <%= driver.freeText%> 可用, 共 <%= driver.totalText%>
+            <!--<div>
+                <%= driver.freeText%> 可用, 共 <%= driver.totalText%>
+            </div>-->
+        </div>
+    </div>
+    <br>
+    <%}%>
+</div>
+
+
+<script type="text/javascript">
+</script>
